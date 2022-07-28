@@ -1,0 +1,2 @@
+wallabag_root_dir: /var/www/wallabag    # Root directory where Wallabag is located
+wallabag_php_user: www-data             # Owner of the Wallabag files / user who's running Wallabag.

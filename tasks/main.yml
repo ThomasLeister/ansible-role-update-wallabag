@@ -1,0 +1,38 @@
+---
+
+- name: Get local Wallabag version
+  become: true
+  become_user: "{{ wallabag_php_user }}"
+  become_method: su
+  shell: 
+    chdir: "{{ wallabag_root_dir }}"
+    cmd: git describe --tags --abbrev=0
+  changed_when: False
+  register: local_ver
+
+- name: Get remote Wallabag version
+  become: true
+  become_user: "{{ wallabag_php_user }}"
+  become_method: su
+  shell: 
+    chdir: "{{ wallabag_root_dir }}"
+    cmd: git fetch && git describe --tags --abbrev=0 origin
+  changed_when: False
+  register: remote_ver
+
+- name: Print versions
+  ansible.builtin.debug:
+    msg: "Latest local version: '{{ local_ver.stdout }}' | Latest remote version: '{{ remote_ver.stdout }}'"
+
+# if remote version is not equal to local version
+- name: Update Wallabag to the latest version via 'make update'
+  become: true
+  become_user: "{{ wallabag_php_user }}"
+  become_method: su
+  shell: 
+    chdir: "{{ wallabag_root_dir }}"
+    cmd: make update
+  when: local_ver.stdout != remote_ver.stdout
+
+
+    
